@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  drupal:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - drupal-data:/var/www/html
+    depends_on:
+      - db
+    environment:
+      - DRUPAL_DB_HOST=db
+      - DRUPAL_DB_PORT=5432
+      - DRUPAL_DB_USER=drupal
+      - DRUPAL_DB_PASSWORD=drupal_password
+      - DRUPAL_DB_NAME=drupal
+    restart: unless-stopped
+
+  db:
+    image: postgres:14
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=drupal
+      - POSTGRES_USER=drupal
+      - POSTGRES_PASSWORD=drupal_password
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@example.com
+      - PGADMIN_DEFAULT_PASSWORD=admin_password
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  drupal-data:
+  db-data:
